@@ -20,7 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dto\" />
+    <Folder Include="Dto\RoleClaims\" />
+    <Folder Include="Dto\Role\" />
+    <Folder Include="Dto\UserClaims\" />
   </ItemGroup>
 
 </Project>
