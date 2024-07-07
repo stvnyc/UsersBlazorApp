@@ -46,12 +46,6 @@ public partial class AspNetUsers
     [InverseProperty("User")]
     public virtual ICollection<AspNetUserClaims> AspNetUserClaims { get; set; } = new List<AspNetUserClaims>();
 
-    [InverseProperty("User")]
-    public virtual ICollection<AspNetUserLogins> AspNetUserLogins { get; set; } = new List<AspNetUserLogins>();
-
-    [InverseProperty("User")]
-    public virtual ICollection<AspNetUserTokens> AspNetUserTokens { get; set; } = new List<AspNetUserTokens>();
-
     [ForeignKey("UserId")]
     [InverseProperty("User")]
     public virtual ICollection<AspNetRoles> Role { get; set; } = new List<AspNetRoles>();
