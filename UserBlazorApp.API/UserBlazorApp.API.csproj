@@ -19,10 +19,4 @@
     <ProjectReference Include="..\UsersBlazorApp.Data\UsersBlazorApp.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dto\RoleClaims\" />
-    <Folder Include="Dto\Role\" />
-    <Folder Include="Dto\UserClaims\" />
-  </ItemGroup>
-
 </Project>
