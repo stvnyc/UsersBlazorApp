@@ -19,4 +19,8 @@
     <ProjectReference Include="..\UsersBlazorApp.Data\UsersBlazorApp.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dto\" />
+  </ItemGroup>
+
 </Project>
