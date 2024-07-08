@@ -5,104 +5,105 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UserBlazorApp.API.DTO.Role;
+using UserBlazorApp.API.DTO.RoleClaims;
+using UserBlazorApp.API.DTO.User;
+using UserBlazorApp.API.DTO.UserClaims;
+using UserBlazorApp.API.Services;
 using UsersBlazorApp.API.Context;
+using UsersBlazorApp.Data.Interfaces;
 using UsersBlazorApp.Data.Models;
 
 namespace UserBlazorApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoleClaimsController : ControllerBase
+    public class RoleClaimsController(IRoleClaimsService<AspNetRoleClaims> roleClaimsService) : ControllerBase
     {
-        private readonly UsersDbContext _context;
-
-        public RoleClaimsController(UsersDbContext context)
-        {
-            _context = context;
-        }
 
         // GET: api/RoleClaims
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AspNetRoleClaims>>> GetAspNetRoleClaims()
         {
-            return await _context.AspNetRoleClaims.ToListAsync();
+            var roles = await roleClaimsService.GetAll();
+
+            var roleClaimRespose = roles.Select(r => new RoleClaimResponse
+            {
+                Id = r.Id,
+                RoleId = r.RoleId,
+                ClaimType = r.ClaimType,
+                ClaimValue = r.ClaimValue,
+            }).ToList();
+            return Ok(roleClaimRespose);
         }
 
         // GET: api/RoleClaims/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AspNetRoleClaims>> GetAspNetRoleClaims(int id)
+        public async Task<ActionResult<RoleClaimResponse>> GetAspNetRoleClaims(int id)
         {
-            var aspNetRoleClaims = await _context.AspNetRoleClaims.FindAsync(id);
-
-            if (aspNetRoleClaims == null)
+            var roleClaim = await roleClaimsService.Get(id);
+            if (roleClaim == null)
             {
                 return NotFound();
             }
-
-            return aspNetRoleClaims;
+            var roleResponse = new RoleClaimResponse
+            {
+                Id = roleClaim.Id,
+                RoleId = roleClaim.RoleId,
+                ClaimType = roleClaim.ClaimType,
+                ClaimValue = roleClaim.ClaimValue,
+            };
+            return roleResponse;
         }
 
         // PUT: api/RoleClaims/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAspNetRoleClaims(int id, AspNetRoleClaims aspNetRoleClaims)
+        public async Task<IActionResult> PutAspNetRoleClaims(int id, RoleClaimRequest roleClaimRequest)
         {
-            if (id != aspNetRoleClaims.Id)
+            var roleClaim = await roleClaimsService.Get(id);
+            if (roleClaim == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+            roleClaim.ClaimType = roleClaimRequest.ClaimType;
+            roleClaim.ClaimValue = roleClaimRequest.ClaimValue;
+            var actualizar = await roleClaimsService.Update(roleClaim);
+            if (actualizar == false)
+                return NotFound();
 
-            _context.Entry(aspNetRoleClaims).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AspNetRoleClaimsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/RoleClaims
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AspNetRoleClaims>> PostAspNetRoleClaims(AspNetRoleClaims aspNetRoleClaims)
+        public async Task<ActionResult<AspNetRoleClaims>> PostAspNetRoleClaims(RoleClaimRequest roleClaimRequest)
         {
-            _context.AspNetRoleClaims.Add(aspNetRoleClaims);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAspNetRoleClaims", new { id = aspNetRoleClaims.Id }, aspNetRoleClaims);
+            var usuario = new AspNetRoleClaims
+            {
+                ClaimType = roleClaimRequest.ClaimType,
+                ClaimValue = roleClaimRequest.ClaimValue,
+            };
+            var crearRol = await roleClaimsService.Add(usuario);
+            var roleResponse = new UserClaimResponse
+            {
+                Id = crearRol.Id,
+            };
+            return Ok(roleResponse);
         }
 
         // DELETE: api/RoleClaims/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAspNetRoleClaims(int id)
         {
-            var aspNetRoleClaims = await _context.AspNetRoleClaims.FindAsync(id);
-            if (aspNetRoleClaims == null)
+            var rol = await roleClaimsService.Get(id);
+            if (rol == null)
             {
                 return NotFound();
             }
-
-            _context.AspNetRoleClaims.Remove(aspNetRoleClaims);
-            await _context.SaveChangesAsync();
-
+            await roleClaimsService.Delete(id);
             return NoContent();
-        }
-
-        private bool AspNetRoleClaimsExists(int id)
-        {
-            return _context.AspNetRoleClaims.Any(e => e.Id == id);
         }
     }
 }
