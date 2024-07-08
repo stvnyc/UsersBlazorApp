@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using UsersBlazorApp.Data.Models;
+﻿using UsersBlazorApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace UsersBlazorApp.Data.Context;
+namespace UsersBlazorApp.API.Context;
 
 public partial class UsersDbContext : DbContext
 {
@@ -18,10 +15,6 @@ public partial class UsersDbContext : DbContext
     public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
-
-    public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
-
-    public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
 
     public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
 
