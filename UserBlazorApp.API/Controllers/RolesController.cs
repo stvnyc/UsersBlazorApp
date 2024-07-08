@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using UserBlazorApp.API.DTO.Role;
 using UserBlazorApp.API.DTO.RoleClaims;
 using UserBlazorApp.API.DTO.User;
-using UserBlazorApp.API.Services;
-using UsersBlazorApp.API.Context;
 using UsersBlazorApp.Data.Interfaces;
 using UsersBlazorApp.Data.Models;
 
