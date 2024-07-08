@@ -3,7 +3,7 @@ using UsersBlazorApp.Data.Interfaces;
 using UsersBlazorApp.Data.Models;
 
 namespace UserBlazorApp.UI.Services;
-public class UserClienService(HttpClient httpClient) : IClientService<AspNetUsers>
+public class UserClienService(HttpClient httpClient) : IUserService<AspNetUsers>
 {
     public async Task<List<AspNetUsers>> GetAll()
     {
