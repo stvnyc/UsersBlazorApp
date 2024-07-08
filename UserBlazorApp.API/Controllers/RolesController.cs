@@ -12,7 +12,7 @@ namespace UserBlazorApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RolesController(IAPIService<AspNetRoles> roleService) : ControllerBase
+    public class RolesController(IRoleService<AspNetRoles> roleService) : ControllerBase
     {
 
         // GET: api/Roles
