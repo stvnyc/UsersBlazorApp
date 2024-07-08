@@ -1,108 +1,99 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using UsersBlazorApp.API.Context;
+﻿using Microsoft.AspNetCore.Mvc;
+using UserBlazorApp.API.DTO.UserClaims;
+using UsersBlazorApp.Data.Interfaces;
 using UsersBlazorApp.Data.Models;
 
 namespace UserBlazorApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserClaimsController : ControllerBase
+    public class UserClaimsController(IUserClaimsService<AspNetUserClaims> userClaimsService) : ControllerBase
     {
-        private readonly UsersDbContext _context;
-
-        public UserClaimsController(UsersDbContext context)
-        {
-            _context = context;
-        }
 
         // GET: api/UserClaims
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AspNetUserClaims>>> GetAspNetUserClaims()
         {
-            return await _context.AspNetUserClaims.ToListAsync();
+            var usuarios = await userClaimsService.GetAll();
+
+            var userClaimsRespose = usuarios.Select(u => new UserClaimResponse
+            {
+                Id = u.Id,
+                ClaimType = u.ClaimType,
+                ClaimValue = u.ClaimValue,
+            }).ToList();
+            return Ok(userClaimsRespose);
+
         }
 
         // GET: api/UserClaims/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AspNetUserClaims>> GetAspNetUserClaims(int id)
+        public async Task<ActionResult<UserClaimResponse>> GetAspNetUserClaims(int id)
         {
-            var aspNetUserClaims = await _context.AspNetUserClaims.FindAsync(id);
-
-            if (aspNetUserClaims == null)
+            var usuario = await userClaimsService.Get(id);
+            if (usuario == null)
             {
                 return NotFound();
             }
-
-            return aspNetUserClaims;
+            var userClaimResponse = new UserClaimResponse
+            {
+                Id = usuario.Id,
+                ClaimType = usuario.ClaimType,
+                ClaimValue = usuario.ClaimValue,
+            };
+            return userClaimResponse;
         }
 
         // PUT: api/UserClaims/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAspNetUserClaims(int id, AspNetUserClaims aspNetUserClaims)
+        public async Task<IActionResult> PutAspNetUserClaims(int id, UserClaimRequest userClaimRequest)
         {
-            if (id != aspNetUserClaims.Id)
+            var usuario = await userClaimsService.Get(id);
+            if (usuario == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+            usuario.ClaimType = userClaimRequest.ClaimType;
+            usuario.ClaimValue = userClaimRequest.ClaimValue;
+            var actualizar = await userClaimsService.Update(usuario);
+            if (actualizar == false)
+                return NotFound();
 
-            _context.Entry(aspNetUserClaims).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AspNetUserClaimsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/UserClaims
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AspNetUserClaims>> PostAspNetUserClaims(AspNetUserClaims aspNetUserClaims)
+        public async Task<ActionResult<AspNetUserClaims>> PostAspNetUserClaims(UserClaimRequest userClaimRequest)
         {
-            _context.AspNetUserClaims.Add(aspNetUserClaims);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAspNetUserClaims", new { id = aspNetUserClaims.Id }, aspNetUserClaims);
+            var usuario = new AspNetUserClaims
+            {
+                ClaimType = userClaimRequest.ClaimType,
+                ClaimValue = userClaimRequest.ClaimValue,
+            };
+            var crearUsuarioClaim = await userClaimsService.Add(usuario);
+            var userClaimResponse = new UserClaimResponse
+            {
+                Id = crearUsuarioClaim.Id,
+                ClaimType = crearUsuarioClaim.ClaimType,
+                ClaimValue = crearUsuarioClaim.ClaimValue,
+            };
+            return Ok(userClaimResponse);
         }
 
         // DELETE: api/UserClaims/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAspNetUserClaims(int id)
         {
-            var aspNetUserClaims = await _context.AspNetUserClaims.FindAsync(id);
-            if (aspNetUserClaims == null)
+            var usuarioClaims = await userClaimsService.Get(id);
+            if (usuarioClaims == null)
             {
                 return NotFound();
             }
-
-            _context.AspNetUserClaims.Remove(aspNetUserClaims);
-            await _context.SaveChangesAsync();
-
+            await userClaimsService.Delete(id);
             return NoContent();
-        }
-
-        private bool AspNetUserClaimsExists(int id)
-        {
-            return _context.AspNetUserClaims.Any(e => e.Id == id);
         }
     }
 }
