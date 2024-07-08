@@ -5,7 +5,7 @@ using UsersBlazorApp.Data.Models;
 
 namespace UserBlazorApp.API.Services;
 
-public class UserService(UsersDbContext context) : IAPIService<AspNetUsers>
+public class UserService(UsersDbContext context) : IUserService<AspNetUsers>
 {
     public async Task<List<AspNetUsers>> GetAll()
     {
