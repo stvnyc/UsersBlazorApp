@@ -9,7 +9,7 @@ namespace UserBlazorApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AspNetUsersController(IAPIService<AspNetUsers> userService) : ControllerBase
+    public class UsersController(IAPIService<AspNetUsers> userService) : ControllerBase
     {
 
         // GET: api/AspNetUsers
